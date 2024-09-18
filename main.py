@@ -28,7 +28,7 @@ def follow_log_file(output_log_path):
         try:
             # Check file exists
             log_to_file(output_log_path, f"Monitoring file: {file_path}")
-            file = open(file_path, 'r', encoding='utf-8')
+            file = open(file_path, 'rb')
             file.seek(0, 2)  # Đặt con trỏ về cuối file
             
             while True:
@@ -39,7 +39,7 @@ def follow_log_file(output_log_path):
                 if new_file_path != file_path:
                     file.close()
                     file_path = new_file_path
-                    file = open(file_path, 'r', encoding='utf-8')
+                    file = open(file_path, 'rb')
                     file.seek(0, 2)
 
                     output_log_path = os.path.join(log_path_dir, f"{current_date}.log")
@@ -47,7 +47,8 @@ def follow_log_file(output_log_path):
                     time.sleep(time_loop)
                     continue
                 
-                line = file.readline()
+                binary_data = file.read()
+                line = binary_data.decode('utf-16')
                 if not line:
                     time.sleep(1) 
                     continue
@@ -87,8 +88,10 @@ def monitor_log_and_notify(token, chat_id, output_log_path):
         for line in follow_log_file(output_log_path):
             if line.strip() == '\x00':
                 continue
+            list_text = line.strip().split('\t')
             # Gửi tin nhắn tới Telegram
-            send_telegram_message(token, chat_id, f"{line.strip()}")
+            date_time = time.strftime("%Y-%m-%d %H:%M:%S")
+            send_telegram_message(token, chat_id, f"[{date_time}] - {line.strip()}")
             # Ghi log ra file .txt
             log_to_file(output_log_path, line.strip())
     except Exception as e:
