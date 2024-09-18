@@ -29,6 +29,10 @@
 3. Install the Python script as a Windows service:
     ```bash
     nssm.exe install bot_ea_service
+
+    Set Path  ---->  {Pathdir}\env\Scripts\python.exe
+    Set Starup directory  ----> {Pathdir}\env\Scripts
+    Set arguments ---> {Pathdir}\main.py
     ```
 
 4. Specify the Python executable path and your script's location during the service setup.
